@@ -68,9 +68,11 @@ export async function createVault(password, settings = {}) {
     index: EMPTY_INDEX,
   });
   await rememberKey(key);
+  return key;
 }
 
-async function keyFromPassword(password) {
+/** The vault key for `password`, or null if the password is wrong. */
+export async function keyFromPassword(password) {
   const { vault } = await chrome.storage.local.get('vault');
   if (!vault) throw new Error('Hatswap is not set up yet.');
   const key = await deriveKey(password, fromBase64(vault.kdf.salt), vault.kdf.iterations);

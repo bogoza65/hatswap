@@ -37,6 +37,14 @@ If the site throws the restored session away (usually because it expired on the 
 - The lock icon locks Hatswap right away. Settings has auto-lock, auto-save, change master password and erase everything.
 - Inside the popup on a Mac: **⌘,** opens Settings, **⌘F** searches, **⌘L** locks, **Esc** goes back or closes a sheet.
 
+### Backup and restore
+
+Settings → **Backup & Restore** opens a page in a tab. **Export** asks for your master password and downloads one file (`hatswap-backup-YYYY-MM-DD.json`) with every saved login and your settings, encrypted with that password. Before writing it, Hatswap saves the live session of every active account whose site is open in a tab, so the backup is current. Keep the file somewhere safe: anyone with the file and the password has your accounts.
+
+**Restore** takes the file and the password it was made with. On a fresh install (the Welcome screen has a "Have a backup? Restore it" link) it creates the vault with that password. Into an existing vault it adds accounts you don't have and updates ones where the backup is newer; everything else is left alone. Restoring never changes which account is active on a site, since that only means something on the computer whose cookies match. After a restore, the page offers to grant site access for the restored sites in one prompt.
+
+Sessions in a backup can go stale on sites that strictly rotate tokens, just like a saved account that hasn't been used for a long time. If a restored account is rejected, sign in to it again and use **Replace with Current Session**.
+
 ### Two rules that keep saved accounts working
 
 1. **Never click "Log out" inside the site for an account you've saved.** Logging out kills that session on the server, and the saved copy dies with it. Use **New account** instead.
@@ -63,6 +71,7 @@ How it decides: Hatswap only looks at httpOnly cookies, since login cookies almo
 | Key while unlocked | Kept in `chrome.storage.session`, which lives in memory only, is cleared when Chrome quits, and can't be read by content scripts. |
 | Auto-lock | After N minutes without using Hatswap (1 min to 4 h, or "when Chrome closes"). Every operation checks the timeout before touching the key, and a timer wipes it on time while the service worker is awake. |
 | Not encrypted | Account names, groups, colors and timestamps, so the badge can show the active account while Hatswap is locked. |
+| Backup file | Everything, names included, as one AES-256-GCM blob under a key derived from the master password with a fresh salt. Format: `{ format, version, kdf, data }`. |
 | Network | None. No telemetry, no servers, no remote code. |
 | Messages | The service worker only accepts messages from the extension's own pages. |
 
@@ -105,7 +114,7 @@ node test-site/server.mjs
 
 Open http://app.hatswap.localhost:8787. The test users are in `test-site/accounts.json`.
 
-`tests/e2e.mjs` loads the extension into Playwright's Chromium and drives the real popup against that site: 125 checks covering setup, save, New account, switching back and forth after token rotation and with requests in flight, badge, shortcut, the manual-login guard (a self-rotating cookie, a manual sign-in, a shortcut press while drifted, a site that was signed out by hand), a saved session the server already ended, lock and auto-lock, edit, search, delete, password change, unsupported pages and erase.
+`tests/e2e.mjs` loads the extension into Playwright's Chromium and drives the real popup against that site: 140 checks covering setup, save, New account, switching back and forth after token rotation and with requests in flight, badge, shortcut, the manual-login guard (a self-rotating cookie, a manual sign-in, a shortcut press while drifted, a site that was signed out by hand), a saved session the server already ended, backup export and restore (fresh install, merge, wrong password), lock and auto-lock, edit, search, delete, password change, unsupported pages and erase.
 
 ```bash
 PLAYWRIGHT=/path/to/node_modules/playwright node tests/e2e.mjs --out /tmp/hatswap-e2e
@@ -124,12 +133,14 @@ extension/           ← load this folder in chrome://extensions
   manifest.json
   background.js      service worker: switching, badge, shortcut, permission queue
   popup.html/.js/.css
+  backup.html/.js/.css   Backup & Restore page (opened in a tab)
   fonts/             Outfit, bundled (SIL OFL)
   lib/crypto.js      PBKDF2 + AES-GCM helpers (Web Crypto)
   lib/vault.js       storage layout, lock/unlock, auto-lock, settings
   lib/cookies.js     cookie snapshot / delete / restore
   lib/webstorage.js  localStorage / sessionStorage via chrome.scripting
   lib/identity.js    "is this still the same login?" heuristic
+  lib/backup.js      encrypted backup export / restore
   lib/site.js        URL → site (registrable domain) and host pattern
   lib/accounts.js    colors, sorting, initials
   icons/             generated PNGs
@@ -156,7 +167,6 @@ The store links in the page point at a store search for "hatswap"; replace them 
 
 ## What's left to do
 
-- **Encrypted backup export/import**, so accounts can move between computers or survive a reinstall.
 - **IndexedDB snapshots** for apps that keep their session there.
 - **Exact auto-lock with `chrome.alarms`**, which needs one more (warning-free) permission. Optionally lock when the computer locks, with `chrome.idle`.
 - **`unlimitedStorage`** for people with very many or very heavy accounts.

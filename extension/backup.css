@@ -1,0 +1,73 @@
+/* Backup & Restore page: the popup's look, laid out for a full tab. */
+@import url("popup.css");
+
+body {
+  width: auto;
+  height: auto;
+  min-height: 100vh;
+  overflow: auto;
+  user-select: auto;
+  font-size: 15px;
+}
+.wash { position: fixed; }
+.blob { filter: blur(100px); }
+.blob.a { width: 640px; height: 640px; top: -300px; left: -220px; }
+.blob.b { width: 520px; height: 520px; top: 120px; right: -260px; }
+.blob.c { width: 480px; height: 480px; bottom: -260px; left: 30%; }
+
+.page { position: relative; z-index: 1; width: min(600px, 100% - 32px); margin: 0 auto; padding: 48px 0 72px; }
+.head { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
+.head .mark { margin-top: 4px; }
+.head .hat { width: 40px; height: 40px; }
+.head .lede { margin-top: 4px; }
+.lede { color: var(--ink-2); line-height: 1.5; }
+.lede em { font-style: normal; color: var(--ink); font-weight: 500; }
+
+.card { padding: 26px 26px 24px; border-radius: 26px; }
+.card + .card { margin-top: 18px; }
+.card .title { font-size: 21px; }
+.card .lede { margin-top: 8px; font-size: 14.5px; }
+.form { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+.form .field-rounded { height: 46px; font-size: 15px; }
+.form .btn { height: 46px; font-size: 15px; }
+.form.unlock { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--hairline); }
+.hint { margin-top: 12px; font-size: 13px; color: var(--ink-3); line-height: 1.45; }
+.footnote { margin-top: 22px; text-align: center; font-size: 13px; color: var(--ink-3); }
+
+.drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 26px 16px;
+  border-radius: 18px;
+  border: 1.5px dashed var(--glass-edge);
+  background: var(--field);
+  color: var(--ink-2);
+  font-size: 14px;
+  text-align: center;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+.drop .i { width: 26px; height: 26px; color: var(--ink-3); }
+.drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.drop:hover, .drop.is-over { background: color-mix(in oklab, var(--wash) 12%, transparent); border-color: color-mix(in oklab, var(--wash) 50%, transparent); color: var(--ink); }
+.drop.has-file { border-style: solid; border-color: color-mix(in oklab, var(--ok) 60%, transparent); color: var(--ink); }
+.drop.has-file .i { color: var(--ok); }
+.drop:has(input:focus-visible) { outline: 2.5px solid var(--focus); outline-offset: 2px; }
+
+.result {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: color-mix(in oklab, var(--ok) 14%, transparent);
+  font-size: 14px;
+  line-height: 1.5;
+  transition: opacity 240ms var(--ease-out), transform 480ms var(--spring);
+  @starting-style { opacity: 0; transform: translateY(6px); }
+}
+.result.error { background: color-mix(in oklab, var(--danger) 14%, transparent); }
+.result.warn { background: color-mix(in oklab, var(--warn) 16%, transparent); }
+.result strong { font-weight: 600; }
+.result ul { margin: 6px 0 0; padding-left: 20px; color: var(--ink-2); font-size: 13px; }
+.result .btn { margin-top: 12px; }
+.result .sites { margin-top: 8px; color: var(--ink-2); font-size: 13px; }

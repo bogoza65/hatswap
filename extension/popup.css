@@ -461,6 +461,7 @@ button.cell:active { background: var(--press); transition-duration: 0ms; }
 .welcome { padding: 0 26px; text-align: center; }
 .welcome .app-icon { width: 60px; height: 60px; margin-bottom: 12px; }
 .welcome .subtitle { margin-top: 6px; color: var(--ink-2); }
+.welcome .text-btn { margin-top: 12px; }
 .features { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; text-align: left; }
 .feature { display: flex; gap: 12px; align-items: flex-start; padding: 11px 13px; border-radius: 16px; }
 .feature .i { width: 22px; height: 22px; margin-top: 1px; }

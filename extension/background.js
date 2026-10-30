@@ -8,6 +8,7 @@ import { captureTabs, restoreTabs } from './lib/webstorage.js';
 import * as vault from './lib/vault.js';
 import { cleanMeta, defaultColor, initials, siteKey, sortAccounts, textColorOn } from './lib/accounts.js';
 import { compareIdentity, hasLoginCookies, loginCookiesUnchanged, nextIdentity } from './lib/identity.js';
+import { createBackup, parseBackup, openBackup, restoreBackup } from './lib/backup.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -364,6 +365,32 @@ async function confirmActiveSession(tabId) {
   return { account, warnings };
 }
 
+/**
+ * Before a backup: saves the live session of every active account whose site has
+ * an open tab, so the file isn't a token rotation behind. The manual-login guard
+ * applies as usual; a mismatch is reported, not forced.
+ */
+async function refreshActiveSessions(key) {
+  const index = await vault.getIndex();
+  const warnings = [];
+  for (const [siteKey, id] of Object.entries(index.active)) {
+    const account = index.accounts[id];
+    if (!account) continue;
+    const incognito = siteKey.endsWith('#incognito');
+    try {
+      const tabs = await chrome.tabs.query({ url: hostPattern(account.site) });
+      const tab = tabs.find((t) => t.incognito === incognito && describeUrl(t.url || '').site === account.site);
+      if (!tab) continue;
+      const ctx = await siteContext(tab.id);
+      warnings.push(...(await saveIntoActive(key, ctx, index)).map((w) => `${account.name}: ${w}`));
+    } catch (error) {
+      warnings.push(`${account.name} wasn't refreshed before the backup: ${error.message}`);
+    }
+  }
+  await vault.saveIndex(index);
+  return warnings;
+}
+
 function runSiteAction(action) {
   switch (action?.kind) {
     case 'save': return saveNewAccount(action.tabId, action.meta);
@@ -646,6 +673,21 @@ const handlers = {
   changePassword: async ({ current, next }) => {
     await vault.changePassword(current, next);
     return {};
+  },
+  backupExport: async ({ password }) => {
+    const key = await vault.keyFromPassword(String(password || ''));
+    if (!key) throw new Error('Wrong master password.');
+    const warnings = await refreshActiveSessions(key);
+    const backup = await createBackup(password);
+    return { ...backup, warnings };
+  },
+  backupImport: async ({ text, password }) => {
+    const file = parseBackup(text);
+    const bundle = await openBackup(file, password);
+    const result = await restoreBackup(bundle, password, await vault.getKey());
+    const sites = await Promise.all(result.sites.map(async (s) => ({ ...s, granted: await chrome.permissions.contains({ origins: [s.pattern] }) })));
+    refreshAllBadges();
+    return { ...result, sites, createdAt: file.createdAt };
   },
   reset: async () => {
     await vault.resetAll();

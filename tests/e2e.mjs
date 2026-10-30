@@ -427,6 +427,29 @@ try {
   await switchTo('Alice');
   await expectUser('alice', 'after password change');
 
+  // 13b. Backup export. Switching to Bob first saves Alice's live session, so the
+  // backup's copy of Alice is current (the test site retires old session tokens).
+  await switchTo('Bob Builder');
+  const backupPage = await context.newPage();
+  await backupPage.setViewportSize({ width: 720, height: 900 });
+  const openBackupPage = async (expect) => {
+    await backupPage.goto(`chrome-extension://${extensionId}/backup.html`);
+    await backupPage.waitForFunction((text) => document.querySelector('#status-line').textContent.includes(text), expect);
+  };
+  await openBackupPage('unlocked');
+  await backupPage.fill('#export-form [name=password]', NEW_MASTER);
+  const [download] = await Promise.all([backupPage.waitForEvent('download'), backupPage.click('#export-btn')]);
+  const backupFile = path.join(OUT, 'hatswap-backup.json');
+  await download.saveAs(backupFile);
+  const backupText = readFileSync(backupFile, 'utf8');
+  const backupJson = JSON.parse(backupText);
+  check('backup: downloaded file is a Hatswap backup', backupJson.format === 'hatswap-backup' && backupJson.version === 1 && Boolean(backupJson.data?.ct), download.suggestedFilename());
+  check('backup: nothing readable in the file (names, cookies, settings)', !/Alice|Bob|"cookies"|"settings"|autoLock/.test(backupText), `${backupText.length} bytes`);
+  await backupPage.waitForSelector('#export-result');
+  const exportText = (await backupPage.textContent('#export-result')).trim();
+  check('backup: export reports both accounts', exportText.includes('2 accounts'), exportText);
+  await backupPage.screenshot({ path: path.join(OUT, '16-backup-export.png'), fullPage: true });
+
   // 14. Pages where Chrome blocks extensions
   const chromePage = await context.newPage();
   await chromePage.goto('chrome://version');
@@ -437,12 +460,42 @@ try {
   await chromePage.close();
 
   // 15. Erase everything
-  await openPopup();
-  await popup.click('#settings');
-  await popup.click('text=Erase All Data');
-  await popup.click('.sheet-actions button:has-text("Erase Everything")');
-  await popup.waitForSelector('.features');
+  const eraseAll = async () => {
+    await openPopup();
+    await popup.click('#settings');
+    await popup.click('text=Erase All Data');
+    await popup.click('.sheet-actions button:has-text("Erase Everything")');
+    await popup.waitForSelector('.features');
+  };
+  await eraseAll();
   check('erase returns to first-run setup', (await sw.evaluate(async () => Object.keys(await chrome.storage.local.get(null)).length)) === 0);
+
+  // 15b. Restore on a fresh install, then again into the existing vault.
+  await openBackupPage('No vault');
+  const importResult = () => backupPage.textContent('#import-result').then((t) => t.trim());
+  await backupPage.setInputFiles('#file', backupFile);
+  await backupPage.fill('#import-form [name=password]', 'wrong-password');
+  await backupPage.click('#import-btn');
+  await backupPage.waitForSelector('#import-result.error');
+  check('restore: wrong password is rejected', (await importResult()).includes('Wrong password'), await importResult());
+  await backupPage.fill('#import-form [name=password]', NEW_MASTER);
+  await backupPage.click('#import-btn');
+  await backupPage.waitForFunction(() => /Restored/.test(document.querySelector('#import-result').textContent));
+  const restored = await importResult();
+  check('restore: fresh install creates the vault and adds both accounts', restored.includes('2 accounts added') && restored.includes('vault was created'), restored);
+  await backupPage.screenshot({ path: path.join(OUT, '17-backup-restored.png'), fullPage: true });
+  await openPopup();
+  check('restore: popup is unlocked with the restored accounts, none active', (await popup.locator('.account').count()) === 2 && !(await popup.locator('.account.is-active').count()));
+  await switchTo('Alice');
+  await expectUser('alice', 'restore: switching to a restored account works');
+  await openBackupPage('unlocked');
+  await backupPage.setInputFiles('#file', backupFile);
+  await backupPage.fill('#import-form [name=password]', NEW_MASTER);
+  await backupPage.click('#import-btn');
+  await backupPage.waitForFunction(() => /Restored|Nothing/.test(document.querySelector('#import-result').textContent));
+  check('restore: importing again into the existing vault changes nothing', (await importResult()).includes('2 already up to date'), await importResult());
+  await eraseAll();
+  check('final erase leaves storage empty', (await sw.evaluate(async () => Object.keys(await chrome.storage.local.get(null)).length)) === 0);
 } catch (error) {
   check('test run finished without exceptions', false, error.message.split('\n').slice(0, 12).join(' | '));
   // Leave evidence behind: a screenshot of every open page.

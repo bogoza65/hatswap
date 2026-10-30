@@ -456,6 +456,12 @@ function brandBar() {
       h('button', { class: 'icon-btn', id: 'settings', type: 'button', title: `Settings (${MOD},)`, 'aria-label': 'Settings', onclick: () => goTo('settings') }, icon('gear'))));
 }
 
+/** Backup & Restore lives on its own page: file pickers and downloads don't suit a popup. */
+function openBackupPage() {
+  chrome.tabs.create({ url: chrome.runtime.getURL('backup.html') });
+  if (!pinnedTab) window.close();
+}
+
 function appIcon() {
   return h('img', { class: 'app-icon', src: 'icons/icon128.png', alt: '' });
 }
@@ -481,7 +487,8 @@ function welcomeScreen() {
       h('h1', { class: 'title-large' }, 'Welcome to Hatswap'),
       h('p', { class: 'subtitle' }, 'Switch accounts on the same site in one click.'),
       features,
-      h('p', { class: 'section-footer' }, "Account names and colors aren't encrypted, so the toolbar badge works while Hatswap is locked.")),
+      h('p', { class: 'section-footer' }, "Account names and colors aren't encrypted, so the toolbar badge works while Hatswap is locked."),
+      h('button', { class: 'text-btn small', type: 'button', onclick: openBackupPage }, 'Have a backup? Restore it')),
     toolbar: h('button', { class: 'btn filled large grow', type: 'button', 'data-autofocus': true, onclick: () => { ui.setupStep = 'password'; render(); } }, 'Continue'),
   });
 }
@@ -1175,6 +1182,7 @@ function settingsScreen() {
         children: group(
           cell({}, h('span', { class: 'cell-title' }, 'Saved Accounts'), h('span', { class: 'cell-value' }, `${total} on ${plural(state.sites?.length || 0, 'site')}`)),
           cell({}, h('span', { class: 'cell-title' }, 'Storage'), h('span', { class: 'cell-value' }, `${formatBytes(state.bytesInUse || 0)} of ${formatBytes(STORAGE_QUOTA)}`)),
+          cell({ onclick: openBackupPage }, h('span', { class: 'cell-title' }, 'Backup & Restore'), icon('chevron-right', 'chev')),
           cell({ class: 'destructive', onclick: () => askEraseAll(false) }, h('span', { class: 'cell-title' }, 'Erase All Data…'))),
       }),
     ],

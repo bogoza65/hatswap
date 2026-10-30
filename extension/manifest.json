@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Hatswap",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Switch between saved accounts on the same website with one click. Sessions are encrypted and never leave your computer.",
   "minimum_chrome_version": "120",
   "permissions": ["cookies", "storage", "scripting", "activeTab", "tabs"],
