@@ -465,6 +465,11 @@ function openBackupPage() {
   if (!pinnedTab) window.close();
 }
 
+/** The mascot, for the screens with room to breathe. */
+function mascot(name) {
+  return h('img', { class: 'mascot', src: `icons/mascot/${name}.png`, alt: '', 'aria-hidden': 'true' });
+}
+
 function appIcon() {
   return h('img', { class: 'app-icon', src: 'icons/icon128.png', alt: '' });
 }
@@ -486,7 +491,7 @@ function welcomeScreen() {
   alert.style.color = 'var(--warn)';
   return screen({
     body: h('div', { class: 'welcome' },
-      appIcon(),
+      mascot('wave'),
       h('h1', { class: 'title-large' }, 'Welcome to Hatswap'),
       h('p', { class: 'subtitle' }, 'Switch accounts on the same site in one click.'),
       features,
@@ -546,7 +551,7 @@ function autoLockMenu(name, current) {
 function lockedScreen() {
   return screen({
     body: h('div', { class: 'center lock-screen' },
-      h('div', { class: 'glyph lock-glyph' }, icon('lock-fill')),
+      mascot('asleep'),
       h('h1', { class: 'title' }, 'Hatswap Is Locked'),
       h('p', null, 'Enter your master password to switch accounts.'),
       h('form', { class: 'lock-form', onsubmit: submitUnlock },
@@ -630,7 +635,7 @@ function mainScreen() {
 
   if (!accounts.length) {
     body.push(h('div', { class: 'center empty' },
-      appIcon(),
+      mascot('peek'),
       h('h1', { class: 'title' }, 'No Saved Logins'),
       h('p', null, `Sign in to ${site} on this page, then save the login here. New Account clears the way for the next one.`)));
   } else {

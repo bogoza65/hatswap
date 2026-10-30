@@ -151,7 +151,7 @@
     .cta-meta a:hover { color: var(--ink); }
 
     /* The demo: a live mock of the popup */
-    .demo { display: flex; justify-content: center; perspective: 1400px; }
+    .demo { position: relative; display: flex; justify-content: center; perspective: 1400px; }
     .popup {
       position: relative;
       width: 340px;
@@ -218,6 +218,17 @@
     .cursor.is-pressing svg { transform: scale(0.85); }
     .cursor svg { transition: transform 120ms ease; }
 
+    /* The mascot */
+    .mascot { display: block; height: auto; filter: drop-shadow(0 14px 24px rgb(0 0 0 / 0.55)); pointer-events: none; user-select: none; }
+    .hero-cat { position: absolute; left: -92px; bottom: -48px; width: 168px; transform: rotate(-4deg); }
+    .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; }
+    .section-head .mascot { width: 128px; flex: none; margin-bottom: -8px; }
+    .honest.glass { position: relative; padding-right: 140px; }
+    .honest .mascot { position: absolute; right: 18px; top: 50%; width: 98px; transform: translateY(-50%); }
+    .band .inner { position: relative; }
+    .band .peek { position: absolute; right: 56px; bottom: calc(100% - 4px); width: 132px; margin: 0; }
+    .footer-cat { width: 48px; filter: none; }
+
     /* Sections */
     section.block { padding: 72px 0; }
     .section-title { font-size: clamp(30px, 3.6vw, 44px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; }
@@ -263,6 +274,12 @@
       .steps, .cards { grid-template-columns: 1fr; }
       .popup { transform: none; }
       .nav-links a:not(.pill-btn) { display: none; }
+      .hero-cat { left: -14px; bottom: -40px; width: 116px; }
+      .section-head { flex-direction: column; align-items: flex-start; }
+      .section-head .mascot { width: 104px; margin: 0; }
+      .honest.glass { padding-right: 22px; padding-bottom: 104px; }
+      .honest .mascot { top: auto; bottom: 10px; right: 14px; width: 88px; transform: none; }
+      .band .peek { width: 104px; right: 24px; }
     }
     @media (max-width: 420px) {
       .popup { width: 100%; max-width: 340px; }
@@ -358,12 +375,18 @@
               </div>
             </div>
           </div>
+          <img class="mascot hero-cat" src="mascot/pose-4.png" alt="" aria-hidden="true">
         </div>
       </section>
 
       <section class="block" id="how">
-        <h2 class="section-title">Save once. Switch forever.</h2>
-        <p class="section-lede">No more logging out and in. No more five Chrome windows with five sets of bookmarks.</p>
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Save once. Switch forever.</h2>
+            <p class="section-lede">No more logging out and in. No more five Chrome windows with five sets of bookmarks.</p>
+          </div>
+          <img class="mascot" src="mascot/pose-2.png" alt="" aria-hidden="true">
+        </div>
         <div class="steps">
           <div class="step glass">
             <span class="n">1</span>
@@ -384,8 +407,13 @@
       </section>
 
       <section class="block" id="privacy">
-        <h2 class="section-title">A saved login is a key. Treated like one.</h2>
-        <p class="section-lede">Hatswap holds the sessions to your clients' accounts, so it was built to be checked, not trusted.</p>
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">A saved login is a key. Treated like one.</h2>
+            <p class="section-lede">Hatswap holds the sessions to your clients' accounts, so it was built to be checked, not trusted.</p>
+          </div>
+          <img class="mascot" src="mascot/pose-6.png" alt="" aria-hidden="true">
+        </div>
         <div class="cards">
           <div class="card glass">
             <span class="icon"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2.5"/><path d="M8 21h8M12 17v4"/></svg></span>
@@ -404,13 +432,19 @@
           </div>
         </div>
         <div class="honest glass">
+          <img class="mascot" src="mascot/pose-7.png" alt="" aria-hidden="true">
           <strong>Honest limits.</strong> Hatswap handles cookies and local storage. A few apps keep their login elsewhere or tie it to the device; those won't switch. It switches a whole site at once, so it's made for business and client accounts, not for several personal profiles. Never click "Log out" inside a site for an account you've saved; use New Account instead. Details in the <a href="https://github.com/bogoza65/hatswap#known-limitations" rel="noopener">README</a>.
         </div>
       </section>
 
       <section class="block" id="works">
-        <h2 class="section-title">Made for client work.</h2>
-        <p class="section-lede">Names, colours and client groups per account. A badge in every tab. A guard that asks before saving the wrong login over a client's account.</p>
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Made for client work.</h2>
+            <p class="section-lede">Names, colours and client groups per account. A badge in every tab. A guard that asks before saving the wrong login over a client's account.</p>
+          </div>
+          <img class="mascot" src="mascot/pose-8.png" alt="" aria-hidden="true">
+        </div>
         <div class="works" aria-label="Works with">
           <span class="glass">Buffer</span><span class="glass">Meta Business Suite</span><span class="glass">Shopify</span><span class="glass">Google Workspace</span><span class="glass">Any site with a login</span>
         </div>
@@ -418,6 +452,7 @@
 
       <section class="band">
         <div class="inner glass">
+          <img class="mascot peek" src="mascot/pose-5.png" alt="" aria-hidden="true">
           <h2>Stop logging out and in.</h2>
           <p>Free, open source, and yours in two minutes.</p>
           <a class="cta" href="https://chromewebstore.google.com/search/hatswap" rel="noopener">
@@ -430,6 +465,7 @@
 
       <footer>
         <div class="row">
+          <img class="mascot footer-cat" src="mascot/pose-1.png" alt="" aria-hidden="true">
           <span>Made in Fredrikstad, Norway by <a href="https://nordweb.io" rel="noopener">Sander Larsen · NordWeb</a></span>
           <span class="spacer"></span>
           <a href="privacy.html">Privacy policy</a>
