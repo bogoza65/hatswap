@@ -98,13 +98,15 @@
     .nav-links a.pill-btn { background: var(--ink); color: var(--bg); font-weight: 600; }
     .nav-links a.pill-btn:hover { background: #fff; }
 
-    /* Hat mark (same drawing as the popup) */
-    .mark { --band: var(--coral); display: grid; flex: none; color: var(--ink); }
-    .hat { width: 26px; height: 26px; transform-origin: 50% 78%; }
-    /* currentColor, so the hat takes its colour from wherever it sits (dark on the white button). */
-    .hat-crown, .hat-brim { fill: currentColor; }
-    .hat-band { fill: var(--band); transition: fill 400ms ease 120ms; }
-    .mark.is-swapping .hat { animation: hat-swap 680ms var(--ease-out); }
+    /* Hat mark: the artwork, with the band as a masked layer so it can take a colour. */
+    .mark { --band: var(--coral); position: relative; display: block; flex: none; width: 32px; aspect-ratio: 1248 / 853; transform-origin: 50% 85%; }
+    .hat { display: block; width: 100%; height: 100%; object-fit: contain; }
+    .hat-band {
+      position: absolute; inset: 0; background: var(--band);
+      -webkit-mask: url("hat-band.png") center / contain no-repeat; mask: url("hat-band.png") center / contain no-repeat;
+      transition: background-color 400ms ease 120ms;
+    }
+    .mark.is-swapping { animation: hat-swap 680ms var(--ease-out); }
     @keyframes hat-swap {
       0% { transform: none; }
       28% { transform: translateY(-5px) rotate(-16deg); }
@@ -137,8 +139,7 @@
       box-shadow: 0 0 0 0 color-mix(in oklab, var(--wash) 0%, transparent), 0 20px 50px -20px rgb(0 0 0 / 0.9);
       transition: transform 420ms var(--spring), box-shadow 400ms ease;
     }
-    .cta .mark { --band: var(--wash); color: #15161a; }
-    .cta .hat { width: 30px; height: 30px; }
+    .cta .mark { --band: var(--wash); width: 38px; }
     .cta .i { width: 22px; height: 22px; margin-left: 2px; stroke-width: 2.2; transition: transform 320ms var(--spring); }
     .cta:hover { transform: translateY(-2px); box-shadow: 0 0 0 6px color-mix(in oklab, var(--wash) 28%, transparent), 0 24px 60px -18px color-mix(in oklab, var(--wash) 60%, #000); }
     .cta:hover .i { transform: translateX(4px); }
@@ -168,7 +169,7 @@
     .popup .blob.b { width: 240px; height: 240px; bottom: -120px; right: -100px; opacity: 0.3; }
     .popup-ui { position: absolute; inset: 0; display: flex; flex-direction: column; }
     .p-bar { position: absolute; left: 10px; right: 10px; top: 10px; z-index: 2; display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 8px 0 12px; border-radius: 999px; }
-    .p-bar .hat { width: 22px; height: 22px; }
+    .p-bar .mark { width: 26px; }
     .p-bar .site { font-weight: 600; font-size: 14px; }
     .p-bar .icons { margin-left: auto; display: flex; gap: 4px; color: var(--ink-2); }
     .p-bar .icons .i { width: 18px; height: 18px; }
@@ -280,11 +281,6 @@
   <div class="waves-mask" aria-hidden="true"></div>
 
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <symbol id="hat-symbol" viewBox="0 0 28 28">
-      <path class="hat-crown" d="M7.6 5.2h12.8a.9.9 0 0 1 .9 1L20 18H8L6.7 6.2a.9.9 0 0 1 .9-1z"/>
-      <path class="hat-band" d="M7.56 13.6h12.88L20 18H8z"/>
-      <rect class="hat-brim" x="3.5" y="18" width="21" height="3.4" rx="1.7"/>
-    </symbol>
     <symbol id="check" viewBox="0 0 24 24"><path d="m5.5 12.5 4 4L18.5 7"/></symbol>
   </svg>
 
@@ -293,7 +289,7 @@
       <div class="wrap">
         <div class="bar glass">
           <a class="brand" href="#top" aria-label="Hatswap">
-            <span class="mark" id="nav-mark"><svg class="hat" aria-hidden="true"><use href="#hat-symbol"/></svg></span>
+            <span class="mark" id="nav-mark"><img class="hat" src="hat.png" alt=""><span class="hat-band" aria-hidden="true"></span></span>
             Hatswap
           </a>
           <nav class="nav-links" aria-label="Site">
@@ -313,7 +309,7 @@
           <p class="lede">One click, same tab. Hatswap keeps every login you save on this site a click apart, for people who manage several clients on <strong>Buffer, Meta Business Suite, Shopify and Google</strong>. Encrypted, and it never leaves your computer.</p>
           <!-- Replace the href with the store detail URL once the listing is live. -->
           <a class="cta" id="cta" href="https://chromewebstore.google.com/search/hatswap" rel="noopener">
-            <span class="mark"><svg class="hat" aria-hidden="true"><use href="#hat-symbol"/></svg></span>
+            <span class="mark"><img class="hat" src="hat.png" alt=""><span class="hat-band" aria-hidden="true"></span></span>
             See it in the Chrome Web Store
             <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
           </a>
@@ -330,7 +326,7 @@
             <span class="blob a" aria-hidden="true"></span><span class="blob b" aria-hidden="true"></span>
             <div class="popup-ui">
               <div class="p-bar glass">
-                <span class="mark" id="popup-mark"><svg class="hat" aria-hidden="true"><use href="#hat-symbol"/></svg></span>
+                <span class="mark" id="popup-mark"><img class="hat" src="hat.png" alt=""><span class="hat-band" aria-hidden="true"></span></span>
                 <span class="site">shopify.com</span>
                 <span class="icons" aria-hidden="true">
                   <svg class="i" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
@@ -425,7 +421,7 @@
           <h2>Stop logging out and in.</h2>
           <p>Free, open source, and yours in two minutes.</p>
           <a class="cta" href="https://chromewebstore.google.com/search/hatswap" rel="noopener">
-            <span class="mark"><svg class="hat" aria-hidden="true"><use href="#hat-symbol"/></svg></span>
+            <span class="mark"><img class="hat" src="hat.png" alt=""><span class="hat-band" aria-hidden="true"></span></span>
             See it in the Chrome Web Store
             <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
           </a>
