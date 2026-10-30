@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="light dark">
+  <title>Hatswap</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- The wash: a soft colour field behind every surface that takes the active account's colour. -->
+  <div class="wash" aria-hidden="true"><span class="blob a"></span><span class="blob b"></span><span class="blob c"></span></div>
+  <div id="app"><main id="view"></main></div>
+  <!-- Modal sheet (save / edit / "is this still X?"): rises on a spring, the app sinks behind it. -->
+  <div class="layer sheet-layer" id="sheet-layer" data-open="false" inert>
+    <div class="scrim" data-dismiss="sheet"></div>
+    <section class="sheet" role="dialog" aria-modal="true"></section>
+  </div>
+  <!-- Confirmations: a floating glass card. -->
+  <div class="layer action-layer" id="action-layer" data-open="false" inert>
+    <div class="scrim" data-dismiss="action"></div>
+    <section class="action-sheet confirm sheet-actions" role="alertdialog" aria-modal="true"></section>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "_note": "Test-only accounts for the local Hatswap test site. Not real credentials.",
+  "alice": { "password": "alice-test-pass", "workspace": "Kinn", "theme": "light" },
+  "bob": { "password": "bob-test-pass", "workspace": "NordWeb", "theme": "dark" },
+  "carol": { "password": "carol-test-pass", "workspace": "Carol Co", "theme": "light" },
+  "dave": { "password": "dave-test-pass", "workspace": "Dave Inc", "theme": "dark" },
+  "erin": { "password": "erin-test-pass", "workspace": "Erin AS", "theme": "light" }
+}

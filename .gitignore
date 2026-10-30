@@ -1,0 +1,12 @@
+# Internal strategy, not for the public repo
+docs/MARKETING-PLAN.md
+
+# OS / editor noise
+.DS_Store
+Icon?
+Thumbs.db
+*.swp
+
+# Dependencies and local output
+node_modules/
+*.zip

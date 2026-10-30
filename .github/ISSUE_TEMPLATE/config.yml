@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security issue
+    url: https://github.com/bogoza65/hatswap/security/advisories/new
+    about: Report privately if you found a way to read sessions or make Hatswap send data anywhere.

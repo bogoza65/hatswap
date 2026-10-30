@@ -1,0 +1,36 @@
+# Publishes only the site/ folder to GitHub Pages, so docs/ (marketing plan,
+# internal notes) and the extension source stay out of the public site.
+#
+# To use: grant gh the workflow scope (gh auth refresh -s workflow), move this
+# file to .github/workflows/pages.yml, and set Settings → Pages → Source to
+# "GitHub Actions".
+name: Publish site
+
+on:
+  push:
+    branches: [main]
+    paths: ["site/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4
