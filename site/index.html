@@ -56,21 +56,26 @@
     .i { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     :focus-visible { outline: 2.5px solid color-mix(in oklab, var(--wash) 60%, #fff); outline-offset: 3px; }
 
-    /* The wash: the page's colour follows the account that is active in the demo. */
-    .wash { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    /* The waves: a crisp field of flowing lines drawn at device resolution, in the
+       colour of the account that is active in the demo. A mask keeps the text side calm. */
+    .waves { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
+    .waves-mask {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        linear-gradient(90deg, rgb(13 13 16 / 0.92) 0%, rgb(13 13 16 / 0.72) 26%, rgb(13 13 16 / 0.25) 50%, transparent 68%),
+        linear-gradient(180deg, var(--bg) 0%, transparent 18%, transparent 86%, var(--bg) 100%);
+    }
+    /* The demo popup keeps its own soft blobs, like the real popup. */
     .blob {
       position: absolute;
       border-radius: 50%;
       background: var(--wash);
       opacity: 0.4;
-      filter: blur(110px);
+      filter: blur(60px);
       transition: background-color 1200ms ease;
       animation: drift 32s ease-in-out infinite alternate;
     }
-    .blob.a { width: 720px; height: 720px; top: -340px; left: -260px; }
-    .blob.b { width: 560px; height: 560px; top: 160px; right: -300px; opacity: 0.26; animation-duration: 38s; animation-delay: -12s; }
-    .blob.c { width: 520px; height: 520px; bottom: -300px; left: 30%; opacity: 0.2; animation-duration: 29s; animation-delay: -20s; }
-    @keyframes drift { from { transform: translate(0, 0) scale(1); } to { transform: translate(60px, 50px) scale(1.12); } }
+    @keyframes drift { from { transform: translate(0, 0) scale(1); } to { transform: translate(24px, 18px) scale(1.1); } }
 
     .page { position: relative; z-index: 1; }
     .wrap { width: min(1120px, 100% - 32px); margin: 0 auto; }
@@ -110,9 +115,7 @@
 
     /* Hero */
     .hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; padding: 72px 0 56px; min-height: calc(100vh - 100px); }
-    .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 8px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); }
-    .eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 4px color-mix(in oklab, var(--ok) 25%, transparent); }
-    h1 { margin-top: 22px; font-size: clamp(42px, 6.2vw, 74px); line-height: 1.02; font-weight: 700; letter-spacing: -0.035em; }
+    h1 { margin-top: 0; font-size: clamp(42px, 6.2vw, 74px); line-height: 1.02; font-weight: 700; letter-spacing: -0.035em; }
     h1 em { font-style: normal; color: var(--wash); transition: color 1200ms ease; }
     .lede { margin-top: 22px; max-width: 540px; font-size: clamp(17px, 1.6vw, 20px); line-height: 1.5; color: var(--ink-2); }
     .lede strong { color: var(--ink); font-weight: 500; }
@@ -161,7 +164,6 @@
       font-size: 13.5px;
     }
     .demo:hover .popup { transform: none; }
-    .popup .blob { filter: blur(60px); }
     .popup .blob.a { width: 300px; height: 300px; top: -130px; left: -80px; opacity: 0.45; }
     .popup .blob.b { width: 240px; height: 240px; bottom: -120px; right: -100px; opacity: 0.3; }
     .popup-ui { position: absolute; inset: 0; display: flex; flex-direction: column; }
@@ -274,7 +276,8 @@
   </style>
 </head>
 <body>
-  <div class="wash" aria-hidden="true"><span class="blob a"></span><span class="blob b"></span><span class="blob c"></span></div>
+  <canvas class="waves" id="waves" aria-hidden="true"></canvas>
+  <div class="waves-mask" aria-hidden="true"></div>
 
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="hat-symbol" viewBox="0 0 28 28">
@@ -306,7 +309,6 @@
     <main class="wrap" id="top">
       <section class="hero">
         <div class="hero-text">
-          <span class="eyebrow glass"><span class="dot" aria-hidden="true"></span>Free Chrome extension · Open source</span>
           <h1>Switch accounts <em>without</em> logging out.</h1>
           <p class="lede">One click, same tab. Hatswap keeps every login you save on this site a click apart, for people who manage several clients on <strong>Buffer, Meta Business Suite, Shopify and Google</strong>. Encrypted, and it never leaves your computer.</p>
           <!-- Replace the href with the store detail URL once the listing is live. -->
@@ -443,6 +445,73 @@
   </div>
 
   <script>
+    // Waves: ~50 horizontal lines, each displaced by three slow sine fields, with the
+    // amplitude and opacity peaking in a band across the middle so it reads as a
+    // single surface. Drawn at device pixel ratio so the lines stay crisp, tinted
+    // by --wash (eased, so colour changes glide), paused when the tab is hidden.
+    (() => {
+      const canvas = document.getElementById('waves');
+      const ctx = canvas.getContext('2d');
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const probe = document.createElement('span');
+      probe.style.cssText = 'position:absolute;visibility:hidden;color:var(--wash)';
+      document.body.append(probe);
+      let w = 0, h = 0, color = [255, 90, 60], target = color, frame = 0;
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = innerWidth; h = innerHeight;
+        canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        if (reduced) draw(0);
+      }
+
+      function readColor() {
+        const m = getComputedStyle(probe).color.match(/[\d.]+/g);
+        if (m && m.length >= 3) target = m.slice(0, 3).map(Number);
+      }
+
+      function draw(t) {
+        ctx.clearRect(0, 0, w, h);
+        color = color.map((c, i) => c + (target[i] - c) * 0.04);
+        const rows = Math.max(40, Math.round(h / 13));
+        const gap = h / rows;
+        const step = w > 900 ? 5 : 7;
+        for (let i = -4; i < rows + 4; i++) {
+          const depth = i / rows;
+          const bulge = Math.exp(-((depth - 0.52) ** 2) / 0.05);
+          const amp = 8 + 64 * bulge;
+          const alpha = 0.08 + 0.5 * bulge;
+          // The ridge lightens toward white, so the crest reads as lit.
+          const [r, g, b] = color.map((c) => Math.round(c + (255 - c) * 0.35 * bulge));
+          ctx.beginPath();
+          for (let x = -step; x <= w + step; x += step) {
+            const nx = x / w;
+            const y = i * gap
+              + amp * Math.sin(nx * 4.6 + t * 0.00031 + i * 0.26)
+              + amp * 0.45 * Math.sin(nx * 9.3 - t * 0.00019 + i * 0.12)
+              + amp * 0.3 * Math.sin(nx * 1.9 + t * 0.00047 - i * 0.06);
+            x === -step ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`;
+          ctx.lineWidth = 0.9 + 0.9 * bulge;
+          ctx.stroke();
+        }
+      }
+
+      function loop(t) {
+        if (!document.hidden) { if (frame++ % 20 === 0) readColor(); draw(t); }
+        requestAnimationFrame(loop);
+      }
+
+      addEventListener('resize', resize);
+      resize();
+      readColor();
+      color = target;
+      if (reduced) { draw(0); return; }
+      requestAnimationFrame(loop);
+    })();
+
     // The demo cycles through the saved accounts on its own: the cursor moves to a
     // row, clicks, the pill flows there, the check pops in, and the whole page's
     // wash takes that account's colour. Hover to pause and look around.
