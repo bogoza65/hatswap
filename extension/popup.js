@@ -915,7 +915,7 @@ function formSheet() {
         footer: editing ? `${account.site} · saved ${timeAgo(account.updatedAt)}` : `Saves the login that's open on ${state.tab.site} right now.`,
         children: group(
           inputCell('Name', { type: 'text', name: 'name', value: f.name, maxlength: 60, required: true, placeholder: 'Required', 'data-autofocus': true, oninput: (e) => updatePreview(e.target.form) }),
-          inputCell('Client', { type: 'text', name: 'group', value: f.group, maxlength: 40, list: 'group-options', placeholder: 'e.g. Kinn, NordWeb' })),
+          inputCell('Client', { type: 'text', name: 'group', value: f.group, maxlength: 40, list: 'group-options', placeholder: 'e.g. Fjord & Pine' })),
       }),
       h('datalist', { id: 'group-options' }, (state.groups || []).map((g) => h('option', { value: g }))),
       section({

@@ -20,7 +20,7 @@ Requires Chrome 120 or newer. No build step: the folder is the extension.
 
 **First run.** Click the Hatswap icon. You'll see what Hatswap stores and why it matters, then pick a master password (8+ characters) and an auto-lock time.
 
-**Save your first account.** Sign in to the site as usual, open Hatswap and click **Save as new account**. Give it a name, a client/group (for example "Kinn" or "NordWeb") and a color. The first time, Chrome asks you to give Hatswap access to that site (for example `buffer.com` and its subdomains). Access is per site; Hatswap never asks for all sites.
+**Save your first account.** Sign in to the site as usual, open Hatswap and click **Save as new account**. Give it a name, a client/group (the client's name works well) and a color. The first time, Chrome asks you to give Hatswap access to that site (for example `buffer.com` and its subdomains). Access is per site; Hatswap never asks for all sites.
 
 **Add the next account.** Click **New account**. That clears the site's session in this browser (it does *not* log you out on the server), so you can sign in with the other account and click **Save as new account** again.
 
@@ -55,8 +55,8 @@ Sessions in a backup can go stale on sites that strictly rotate tokens, just lik
 Before you switch, auto-save copies the live session into the active account. If you signed in to a different account without Hatswap (or cleared the site's cookies), that would overwrite the wrong account. So Hatswap first checks whether the live session still looks like the active account. If it doesn't, nothing is saved and you get a question:
 
 - **Save it as a new account**, then carry on with the switch.
-- **It's still "Kinn"**: save it anyway. Hatswap remembers that the cookies that changed rotate on their own and won't ask about them again.
-- **Switch without saving it**, or **Restore saved "Kinn"** to put the saved session back.
+- **It's still "Fjord & Pine"**: save it anyway. Hatswap remembers that the cookies that changed rotate on their own and won't ask about them again.
+- **Switch without saving it**, or **Restore saved "Fjord & Pine"** to put the saved session back.
 
 The popup shows a yellow banner whenever the live session has drifted, and the keyboard shortcut refuses to switch (the badge shows **?**) until you've answered.
 

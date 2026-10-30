@@ -37,7 +37,7 @@ export function sortAccounts(accounts) {
   });
 }
 
-/** "Kinn Buffer" -> "KB", "NordWeb" -> "NW", "acme" -> "AC", "Ørsta (main)" -> "ØM". */
+/** "Fjord & Pine" -> "FP", "Nordlys" -> "NO", "acme" -> "AC", "Ørsta (main)" -> "ØM". */
 export function initials(name) {
   const words = String(name)
     .replace(/(\p{Ll})(\p{Lu})/gu, '$1 $2')
