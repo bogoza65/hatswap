@@ -124,7 +124,7 @@ The test copy of the extension gets the test host as a pre-granted `host_permiss
 
 Developer hooks: `popup.html?tabId=<id>` opens the popup against a specific tab, and `hatswap.runCommand('switch-next')` in the service-worker console runs the shortcut.
 
-Regenerate the icons with `node scripts/generate-icons.mjs`.
+Regenerate the icons and the hat mark from `brand/hat-source.webp` with `python3 scripts/brand-assets.py` (needs Pillow).
 
 ## Project structure
 
@@ -144,7 +144,8 @@ extension/           ← load this folder in chrome://extensions
   lib/site.js        URL → site (registrable domain) and host pattern
   lib/accounts.js    colors, sorting, initials
   icons/             generated PNGs
-scripts/generate-icons.mjs
+scripts/brand-assets.py   builds every hat image (icons, UI mark layers) from brand/hat-source.webp
+brand/               the logo artwork
 site/                the homepage (index.html) and privacy policy, static, no build
 scripts/github-pages-workflow.yml   optional Actions workflow that publishes site/
 test-site/           local two-account test site

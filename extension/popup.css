@@ -185,12 +185,19 @@ body.modal-open #app { transition-duration: 320ms; filter: blur(3px); }
 
 .brand { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .brand-site { font-size: 14.5px; font-weight: 600; letter-spacing: 0.005em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mark { --band: var(--coral); display: grid; flex: none; }
-.hat { width: 24px; height: 24px; transform-origin: 50% 78%; }
-.hat-crown, .hat-brim { fill: var(--ink); }
-.hat-band { fill: var(--band); transition: fill 320ms ease 120ms; }
+/* The brand hat: the artwork, with the band as a masked layer so it can take a colour. */
+.mark { --band: var(--coral); position: relative; display: block; flex: none; width: 30px; aspect-ratio: 1248 / 853; transform-origin: 50% 85%; }
+.hat { display: block; width: 100%; height: 100%; object-fit: contain; }
+.hat-band {
+  position: absolute;
+  inset: 0;
+  background: var(--band);
+  -webkit-mask: url("icons/hat-band.png") center / contain no-repeat;
+  mask: url("icons/hat-band.png") center / contain no-repeat;
+  transition: background-color 320ms ease 120ms;
+}
 /* The hat tips and drops back while its band takes the new account's colour. */
-.mark.is-swapping .hat { animation: hat-swap 680ms var(--ease-out); }
+.mark.is-swapping { animation: hat-swap 680ms var(--ease-out); }
 @keyframes hat-swap {
   0% { transform: none; }
   28% { transform: translateY(-5px) rotate(-16deg); }

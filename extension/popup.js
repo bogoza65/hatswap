@@ -76,7 +76,10 @@ const ICONS = {
   shield: '<path d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6z" fill="currentColor" stroke="none"/><path d="m9 12 2.2 2.2L15.5 10" style="stroke:#fff" stroke-width="2"/>',
 };
 
-const HAT = '<svg class="hat" viewBox="0 0 28 28" aria-hidden="true"><path class="hat-crown" d="M7.6 5.2h12.8a.9.9 0 0 1 .9 1L20 18H8L6.7 6.2a.9.9 0 0 1 .9-1z"/><path class="hat-band" d="M7.56 13.6h12.88L20 18H8z"/><rect class="hat-brim" x="3.5" y="18" width="21" height="3.4" rx="1.7"/></svg>';
+/** The brand hat: the artwork plus a band layer the UI can tint (see .hat-band in popup.css). */
+function hatMark(props = {}) {
+  return h('span', { ...props, class: cls('mark', props.class) }, h('img', { class: 'hat', src: 'icons/hat.png', alt: '' }), h('span', { class: 'hat-band', 'aria-hidden': 'true' }));
+}
 
 function svg(markup) {
   const template = document.createElement('template');
@@ -446,7 +449,7 @@ function setMark(color, { swap = false } = {}) {
 }
 
 function brandBar() {
-  const mark = h('span', { class: 'mark', id: 'mark' }, svg(HAT));
+  const mark = hatMark({ id: 'mark' });
   mark.style.setProperty('--band', activeAccount()?.color || 'var(--coral)');
   mark.addEventListener('animationend', () => mark.classList.remove('is-swapping'));
   return h('header', { class: 'navbar brand-bar' },

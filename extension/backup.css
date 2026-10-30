@@ -17,8 +17,7 @@ body {
 
 .page { position: relative; z-index: 1; width: min(600px, 100% - 32px); margin: 0 auto; padding: 48px 0 72px; }
 .head { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
-.head .mark { margin-top: 4px; }
-.head .hat { width: 40px; height: 40px; }
+.head .mark { width: 52px; margin-top: 6px; }
 .head .lede { margin-top: 4px; }
 .lede { color: var(--ink-2); line-height: 1.5; }
 .lede em { font-style: normal; color: var(--ink); font-weight: 500; }
